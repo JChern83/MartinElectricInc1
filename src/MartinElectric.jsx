@@ -6,6 +6,8 @@ import { Hammer, PanelsTopLeft, PlugZap, Building2, ShieldCheck, Zap, Wrench } f
 import { Reveal, stagger, item } from "./Reveal";
 import EnergyBlobs from "./EnergyBlobs";
 import CounterUp from "./CounterUp";
+import { Menu, X } from "lucide-react";
+
 
 
 
@@ -16,6 +18,14 @@ export default function MartinElectricOnePage() {
     if (saved !== null) return saved === "true";
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
   });
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+// optional: lock body scroll when menu is open
+useEffect(() => {
+  document.body.style.overflow = mobileOpen ? "hidden" : "";
+  return () => { document.body.style.overflow = ""; };
+}, [mobileOpen]);
+
 // Testimonials data (inside MartinElectricOnePage, above return)
 const testimonials = [
   {
@@ -83,25 +93,71 @@ const testimonials = [
   return (
     <div className="scroll-smooth bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
       {/* Sticky header */}
-      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur bg-white/70 dark:bg-neutral-900/60 border-b border-neutral-200 dark:border-neutral-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a href="#home" className="font-semibold tracking-tight">Martin Electric Inc</a>
-          <nav className="hidden md:flex gap-6 text-sm">
-            {sections.map(id => (
-              <a key={id} href={`#${id}`}
-                 className={`pb-1 transition-colors hover:text-emerald-600 ${
-                   active===id ? "text-emerald-600 border-b-2 border-emerald-600"
-                               : "text-neutral-700 dark:text-neutral-300"}`}>
-                {id[0].toUpperCase()+id.slice(1)}
-              </a>
-            ))}
-          </nav>
-          <button onClick={() => setDark(d => !d)}
-                  className="rounded-xl p-2 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-xs">
-            {dark ? "☀" : "🌙"}
-          </button>
-        </div>
-      </header>
+<header className="fixed top-0 inset-x-0 z-50 backdrop-blur bg-white/80 dark:bg-neutral-900/70 border-b border-neutral-200 dark:border-neutral-800">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    {/* Brand */}
+    <a href="#home" className="font-semibold tracking-tight">Martin Electric</a>
+
+    {/* Desktop nav */}
+    <nav className="hidden md:flex gap-6 text-sm">
+      {sections.map(id => (
+        <a
+          key={id}
+          href={`#${id}`}
+          className={`pb-1 transition-colors hover:text-emerald-600 ${
+            active===id
+              ? "text-emerald-600 border-b-2 border-emerald-600"
+              : "text-neutral-700 dark:text-neutral-300"
+          }`}
+        >
+          {id[0].toUpperCase()+id.slice(1)}
+        </a>
+      ))}
+    </nav>
+
+    {/* Dark mode toggle + Mobile button */}
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => setDark(d => !d)}
+        className="rounded-xl p-2 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-xs"
+        aria-label="Toggle dark mode"
+      >
+        {dark ? "☀" : "🌙"}
+      </button>
+
+      {/* Hamburger (mobile only) */}
+      <button
+        className="md:hidden rounded-lg p-2 border border-neutral-200 dark:border-neutral-800"
+        onClick={() => setMobileOpen(o => !o)}
+        aria-label="Open menu"
+        aria-expanded={mobileOpen}
+      >
+        {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </button>
+    </div>
+  </div>
+
+  {/* Mobile menu panel */}
+  {mobileOpen && (
+    <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-900/95 backdrop-blur">
+      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 grid gap-2">
+        {sections.map(id => (
+          <a
+            key={id}
+            href={`#${id}`}
+            className={`py-2 text-sm ${
+              active===id ? "text-emerald-600 font-medium" : "text-neutral-800 dark:text-neutral-200"
+            }`}
+            onClick={() => setMobileOpen(false)} // close after tap
+          >
+            {id[0].toUpperCase()+id.slice(1)}
+          </a>
+        ))}
+      </nav>
+    </div>
+  )}
+</header>
+
 <motion.div
   style={{ scaleX: progress }}
   className="fixed left-0 top-16 right-0 h-1 origin-left z-[60] bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400"
